@@ -1,0 +1,157 @@
+[
+  {
+    "item": "plastic water bottle",
+    "recyclable": "True",
+    "searched": 0
+  },
+  {
+    "item": "milk jug",
+    "recyclable": "True",
+    "searched": 0
+  },
+  {
+    "item": "cardboard box",
+    "recyclable": "True",
+    "searched": 0
+  },
+  {
+    "item": "pizza box",
+    "recyclable": "False",
+    "searched": 0
+  },
+  {
+    "item": "newspaper",
+    "recyclable": "True",
+    "searched": 0
+  },
+  {
+    "item": "magazine",
+    "recyclable": "True",
+    "searched": 0
+  },
+  {
+    "item": "glass bottle",
+    "recyclable": "True",
+    "searched": 0
+  },
+  {
+    "item": "glass jar",
+    "recyclable": "True",
+    "searched": 0
+  },
+  {
+    "item": "aluminum can",
+    "recyclable": "True",
+    "searched": 0
+  },
+  {
+    "item": "tin can",
+    "recyclable": "True",
+    "searched": 1
+  },
+  {
+    "item": "plastic bag",
+    "recyclable": "False",
+    "searched": 1
+  },
+  {
+    "item": "styrofoam",
+    "recyclable": "False",
+    "searched": 0
+  },
+  {
+    "item": "paper towel",
+    "recyclable": "False",
+    "searched": 0
+  },
+  {
+    "item": "tissue",
+    "recyclable": "False",
+    "searched": 0
+  },
+  {
+    "item": "banana peel",
+    "recyclable": "False",
+    "searched": 0
+  },
+  {
+    "item": "coffee cup",
+    "recyclable": "False",
+    "searched": 0
+  },
+  {
+    "item": "plastic straw",
+    "recyclable": "False",
+    "searched": 6
+  },
+  {
+    "item": "egg carton",
+    "recyclable": "True",
+    "searched": 0
+  },
+  {
+    "item": "cereal box",
+    "recyclable": "True",
+    "searched": 0
+  },
+  {
+    "item": "shampoo bottle",
+    "recyclable": "True",
+    "searched": 0
+  },
+  {
+    "item": "paper",
+    "recyclable": "True",
+    "searched": 0
+  },
+  {
+    "item": "refrigerator",
+    "recyclable": "SD",
+    "searched": 0
+  },
+  {
+    "item": "computer charger",
+    "recyclable": "SD",
+    "searched": 0
+  },
+  {
+    "item": "apple",
+    "recyclable": "False",
+    "searched": 0
+  },
+  {
+    "item": "air pods",
+    "recyclable": "SD",
+    "searched": 2
+  },
+  {
+    "item": "tuna can",
+    "recyclable": "True",
+    "searched": 2
+  },
+  {
+    "item": "laundry detergent bottle",
+    "recyclable": "True",
+    "searched": 1
+  },
+  {
+    "item": "lettuce container",
+    "recyclable": "False",
+    "searched": 2
+  },
+  {
+    "item": "plastic food",
+    "recyclable": "False",
+    "searched": 2
+  },
+  {
+    "item": "tupperware",
+    "recyclable": "False",
+    "searched": 1
+  },
+  {
+    "item": "tin foil",
+    "recyclable": "False",
+    "searched": 1
+  }
+]
