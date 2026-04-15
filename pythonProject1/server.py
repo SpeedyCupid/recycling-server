@@ -1,3 +1,5 @@
+import json
+
 from flask import Flask, request, jsonify
 
 from data_helpers import save_data
@@ -25,7 +27,9 @@ Item:
 """
 API_KEY = "AIzaSyDYCkZMTxGsfKJT5VYNBGmIOZbP3xoF6V0"
 client = genai.Client(api_key=API_KEY)
-
+def save_data(records):
+    with open(DATA_FILE, "w") as f:
+        json.dump(records, f, indent=2)
 
 def chatbot(prompt, client):
     response = client.models.generate_content(

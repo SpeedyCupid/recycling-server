@@ -1,5 +1,4 @@
 
-from google import genai
 import json
 import os
 
@@ -7,23 +6,6 @@ import os
 DATA_FILE = "records.json"
 
 # AI setup
-recycling_prompt = """
-You are a recycling assistant.
-
-The user will give you the name of an item. Your job is to determine whether the item is recyclable.
-
-Rules:
-- Respond with ONLY one of these three options:
-  - "Recyclable"
-  - "Not Recyclable"
-  - "Special Disposal"
-- if recyclability varies by location or material, use "Not Recyclable".
-- Do not explain answers
-
-Item:
-"""
-API_KEY = "AIzaSyDYCkZMTxGsfKJT5VYNBGmIOZbP3xoF6V0"
-client = genai.Client(api_key=API_KEY)
 
 
 def chatbot(prompt, client):
