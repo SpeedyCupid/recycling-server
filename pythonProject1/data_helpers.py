@@ -1,4 +1,4 @@
-import tkinter as tk
+
 from google import genai
 import json
 import os
