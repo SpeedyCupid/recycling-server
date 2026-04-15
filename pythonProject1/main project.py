@@ -5,7 +5,10 @@ from pygments.lexer import words
 import threading
 import data_helpers
 import requests
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 
 #this will be how it gets stuff from a server, when this all happens, records.json in here will be deleted
 #import requests
