@@ -1,14 +1,24 @@
 import json
 
 from flask import Flask, request, jsonify
-
+import os
 from data_helpers import save_data
 from google import genai
+import os
+from dotenv import load_dotenv
+from google import genai
+
+# load .env file (for local use)
+load_dotenv()
+
 
 app = Flask(__name__)
-
-records = []
-
+def load_data():
+    if not os.path.exists("records.json"):
+        return []
+    with open("records.json", "r") as f:
+        return json.load(f)
+records = load_data()
 #AI setup
 recycling_prompt = """
 You are a recycling assistant.
@@ -25,7 +35,7 @@ Rules:
 
 Item:
 """
-API_KEY = "AIzaSyDYCkZMTxGsfKJT5VYNBGmIOZbP3xoF6V0"
+API_KEY = os.environ.get("API_KEY")
 client = genai.Client(api_key=API_KEY)
 
 

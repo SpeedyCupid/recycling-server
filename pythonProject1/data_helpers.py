@@ -79,3 +79,131 @@ def get_most_searched(records):
     Always reflects the latest counts.
     """
     return sorted(records, key=lambda r: r.get("searched", 0), reverse=True)
+
+#
+# import json
+# import os
+#
+# from google import genai
+#
+# DATA_FILE = "records.json"
+#
+# #AI setup
+# recycling_prompt = """
+# You are a recycling assistant.
+#
+# The user will give you the name of an item. Your job is to determine whether the item is recyclable.
+#
+# Rules:
+# - Respond with ONLY one of these three options:
+#   - "Recyclable"
+#   - "Not Recyclable"
+#   - "Special Disposal"
+# - if recyclability varies by location or material, use "Not Recyclable".
+# - Do not explain answers
+#
+# Item:
+# """
+
+# client = genai.Client(api_key=API_KEY)
+#
+#
+#
+#
+# # ---------------- LOAD DATA ----------------
+# def load_data():
+#     """
+#     Load all records from the JSON file.
+#     Returns empty list if file doesn't exist.
+#     """
+#     if not os.path.exists(DATA_FILE):
+#         return []
+#
+#     with open(DATA_FILE, "r") as f:
+#         return json.load(f)
+#
+#
+# # ---------------- SAVE DATA ----------------
+# def save_data(records):
+#     """
+#     Save all records back to JSON file.
+#     """
+#     with open(DATA_FILE, "w") as f:
+#         json.dump(records, f, indent=2)
+#
+#
+# # ---------------- ADD RECORD ----------------
+# def add_record(records, new_record):
+#     """
+#     Add a new record and save immediately.
+#     """
+#     records.append(new_record)
+#     save_data(records)
+#     return records
+#
+#
+# # ---------------- CHECK ITEM ----------------
+# def check_item(records, key, value, ai_prompt_setup=None, client=None):
+#     """
+#     Checks if item exists in records.
+#     If found → return status.
+#     If not found → optionally use AI and add it.
+#     """
+#
+#     for record in records:
+#         record_value = record.get(key)
+#         recyclable_str = record.get("recyclable")
+#
+#         if record_value == value:
+#             # update search count
+#             record["searched"] = record.get("searched", 0) + 1
+#             save_data(records)
+#
+#             status = (
+#                 "recyclable" if recyclable_str == "True"
+#                 else "special disposal" if recyclable_str == "SD"
+#                 else "not recyclable"
+#             )
+#
+#             return f"{record_value} is {status}"
+#
+#     # ---------------- AI fallback ----------------
+#     if ai_prompt_setup is not None and client is not None:
+#         from google import genai
+#
+#         def chatbot(prompt, client):
+#             response = client.models.generate_content(
+#                 model="gemini-2.5-flash",
+#                 contents=prompt
+#             )
+#             return response.text
+#
+#         total_prompt = ai_prompt_setup + value
+#         response = chatbot(total_prompt, client)
+#
+#         if response == "Not Recyclable":
+#             truth = "False"
+#         elif response == "Special Disposal":
+#             truth = "SD"
+#         else:
+#             truth = "True"
+#
+#         new_record = {
+#             "item": value,
+#             "recyclable": truth,
+#             "searched": 1
+#         }
+#
+#         add_record(records, new_record)
+#
+#         return f"{value} is {response}"
+#
+#     return None
+#
+#
+# # ---------------- MOST SEARCHED ----------------
+# def get_most_searched(records):
+#     """
+#     Returns records sorted by search count.
+#     """
+#     return sorted(records, key=lambda r: r.get("searched", 0), reverse=True)

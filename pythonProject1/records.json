@@ -52,7 +52,7 @@
   {
     "item": "plastic bag",
     "recyclable": "False",
-    "searched": 1
+    "searched": 2
   },
   {
     "item": "styrofoam",
@@ -82,7 +82,7 @@
   {
     "item": "plastic straw",
     "recyclable": "False",
-    "searched": 6
+    "searched": 7
   },
   {
     "item": "egg carton",
@@ -151,6 +151,11 @@
   },
   {
     "item": "tin foil",
+    "recyclable": "False",
+    "searched": 1
+  },
+  {
+    "item": "corn",
     "recyclable": "False",
     "searched": 1
   }
