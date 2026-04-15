@@ -52,7 +52,14 @@ def clear_records():
 @app.route("/check", methods=["POST"])
 @app.route("/check", methods=["POST"])
 def check_item():
-    data = request.json
+    data = request.get_json(silent=True)
+
+    if not data or "item" not in data:
+        return jsonify({
+            "found": False,
+            "result": "Invalid request"
+        }), 400
+
     value = data["item"]
 
     # 1. search existing records
@@ -72,12 +79,14 @@ def check_item():
                 "result": f"{value} is {status}"
             })
 
-    # 2. NOT FOUND → use AI
-    if recycling_prompt and client:
+    # 2. NOT FOUND → AI
+    try:
         total_prompt = recycling_prompt + value
         response = chatbot(total_prompt, client)
 
-        # convert AI response into storage format
+        if not response:
+            raise ValueError("Empty AI response")
+
         if response == "Not Recyclable":
             truth = "False"
         elif response == "Special Disposal":
@@ -85,7 +94,6 @@ def check_item():
         else:
             truth = "True"
 
-        # add new record to database
         new_record = {
             "item": value,
             "recyclable": truth,
@@ -100,11 +108,11 @@ def check_item():
             "result": f"{value} is {response}"
         })
 
-    # fallback if AI not set up
-    return jsonify({
-        "found": False,
-        "result": "Item not found and AI not available."
-    })
+    except Exception as e:
+        return jsonify({
+            "found": False,
+            "result": f"AI error: {str(e)}"
+        }), 500
 @app.route("/suggest", methods=["GET"])
 def suggest():
     prefix = request.args.get("q", "").lower().strip()
@@ -130,7 +138,9 @@ def suggest():
     return jsonify(matches[:3])
 
 import os
-
+@app.route("/")
+def home():
+    return "Recycling API is running"
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)

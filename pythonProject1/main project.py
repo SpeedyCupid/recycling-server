@@ -41,7 +41,7 @@ API_KEY = "AIzaSyDYCkZMTxGsfKJT5VYNBGmIOZbP3xoF6V0"
 client = genai.Client(api_key=API_KEY)
 
 # main part
-records = get_records()
+
 
 def button_pressed():
     try:
@@ -77,6 +77,7 @@ def button_pressed():
 #tk stuff
 
 def on_change(*args):
+    records = get_records()
     current_text = entry_var.get().lower()
 
     best_score = -1
