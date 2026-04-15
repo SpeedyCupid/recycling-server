@@ -3,3 +3,4 @@ requests~=2.33.0
 google~=3.0.0
 protobuf~=5.29.6
 Pygments~=2.19.2
+google-generativeai
