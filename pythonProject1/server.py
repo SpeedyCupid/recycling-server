@@ -134,7 +134,7 @@ def check_item():
     try:
         # ===== 1. CHECK DATABASE FIRST =====
         cursor.execute(
-            "SELECT response, searched FROM records WHERE item = ?",
+            "SELECT recyclable, searched FROM records WHERE item = ?",
             (value,)
         )
         row = cursor.fetchone()
@@ -165,7 +165,7 @@ def check_item():
 
         # ===== 3. CHECK DATABASE AGAIN (AFTER CORRECTION) =====
         cursor.execute(
-            "SELECT response, searched FROM records WHERE item = ?",
+            "SELECT recyclable, searched FROM records WHERE item = ?",
             (final_name,)
         )
         row = cursor.fetchone()
@@ -191,7 +191,7 @@ def check_item():
             raise ValueError("Empty AI response")
 
         cursor.execute(
-            "INSERT INTO records (item, response, searched) VALUES (?, ?, ?)",
+            "INSERT INTO records (item, recyclable, searched) VALUES (?, ?, ?)",
             (final_name, response, 1)
         )
         conn.commit()
