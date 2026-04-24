@@ -114,7 +114,7 @@ def get_records():
     return jsonify(result)
 
 
-# 🔥 MAIN CHECK FUNCTION (FIXED)
+
 @app.route("/check", methods=["POST"])
 def check_item():
     data = request.get_json(silent=True)
@@ -125,54 +125,77 @@ def check_item():
             "result": "Invalid request"
         }), 400
 
-    value = data["item"]
+    value = data["item"].lower().strip()
+    confirmed = data.get("confirmed", False)
 
-    # ===== CHECK DATABASE =====
-    cursor.execute(
-        "SELECT recyclable, searched FROM records WHERE item = ?",
-        (value,)
-    )
-    row = cursor.fetchone()
-
-    if row:
-        # UPDATE searched count
+    try:
+        # ===== 1. CHECK DATABASE FIRST =====
         cursor.execute(
-            "UPDATE records SET searched = searched + 1 WHERE item = ?",
+            "SELECT response, searched FROM records WHERE item = ?",
             (value,)
         )
-        conn.commit()
+        row = cursor.fetchone()
 
-        recyclable_str = row[0]
+        if row:
+            cursor.execute(
+                "UPDATE records SET searched = searched + 1 WHERE item = ?",
+                (value,)
+            )
+            conn.commit()
 
-        status = recyclable_str
+            saved_response = row[0]
 
-        return jsonify({
-            "found": True,
-            "result": f"{value}{status}"
-        })
+            return jsonify({
+                "found": True,
+                "result": f"{value}{saved_response}"
+            })
 
-    # ===== NOT FOUND → AI =====
-    try:
-
+        # ===== 2. SPELLING (ONLY IF NOT FOUND) =====
         respo = chatbot(spelling_prompt + value).strip().lower()
-        response = chatbot(recycling_prompt + respo).rstrip()
+
+        if not confirmed and respo != value:
+            return jsonify({
+                "suggestion": respo
+            })
+
+        final_name = respo if confirmed else value
+
+        # ===== 3. CHECK DATABASE AGAIN (AFTER CORRECTION) =====
+        cursor.execute(
+            "SELECT response, searched FROM records WHERE item = ?",
+            (final_name,)
+        )
+        row = cursor.fetchone()
+
+        if row:
+            cursor.execute(
+                "UPDATE records SET searched = searched + 1 WHERE item = ?",
+                (final_name,)
+            )
+            conn.commit()
+
+            saved_response = row[0]
+
+            return jsonify({
+                "found": True,
+                "result": f"{final_name}{saved_response}"
+            })
+
+        # ===== 4. AI RECYCLING =====
+        response = chatbot(recycling_prompt + final_name).rstrip()
 
         if not response:
             raise ValueError("Empty AI response")
 
-        truth = response
-
-
-        # INSERT into database
         cursor.execute(
-            "INSERT INTO records (item, recyclable, searched) VALUES (?, ?, ?)",
-            (respo, truth, 1)
+            "INSERT INTO records (item, response, searched) VALUES (?, ?, ?)",
+            (final_name, response, 1)
         )
         conn.commit()
 
         return jsonify({
             "found": True,
-            "result": f"{respo}{response}"
+            "result": f"{final_name}{response}"
         })
 
     except Exception as e:
@@ -180,8 +203,6 @@ def check_item():
             "found": False,
             "result": f"AI error: {str(e)}"
         }), 500
-
-
 # 🔥 SUGGEST (NOW USES DATABASE, NOT records LIST)
 @app.route("/suggest", methods=["GET"])
 def suggest():

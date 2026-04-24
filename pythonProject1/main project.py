@@ -45,6 +45,28 @@ API_KEY = os.environ.get("API_KEY")
 client = genai.Client(api_key=API_KEY)
 
 # main part
+def process_final_name(final_name):
+    global records
+
+    try:
+        response = requests.post(
+            f"{SERVER_URL}/check",
+            json={"item": final_name, "confirmed": True}
+        )
+
+        result = response.json()
+
+        if result.get("found"):
+            output = result.get("result")
+        else:
+            output = "No result found."
+
+        records = get_records()
+
+    except Exception as e:
+        output = f"Error: {e}"
+
+    label2.config(text=output)
 
 
 def button_pressed():
@@ -70,12 +92,36 @@ def button_pressed():
 
         result = response.json()
 
+        if "suggestion" in result:
+            suggestion = result["suggestion"]
+
+            # 🔥 CLEAR OLD BUTTONS FIRST
+            for widget in suggestion_frame.winfo_children():
+                widget.destroy()
+
+            def use_suggestion():
+                for widget in suggestion_frame.winfo_children():
+                    widget.destroy()
+                process_final_name(suggestion)
+
+            def use_original():
+                for widget in suggestion_frame.winfo_children():
+                    widget.destroy()
+                process_final_name(item)
+
+            label2.config(text=f"Did you mean '{suggestion}'?")
+
+            tk.Button(suggestion_frame, text="Yes", command=use_suggestion).pack()
+            tk.Button(suggestion_frame, text="No", command=use_original).pack()
+
+            return
+
         if result.get("found"):
             output = result.get("result")
         else:
             output = "No result found."
 
-        # 🔥 IMPORTANT: refresh local data AFTER search
+
         try:
             records = get_records()
         except:
