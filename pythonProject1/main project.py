@@ -110,7 +110,7 @@ def on_change(*args):
     if not current_text.strip():
         return
 
-    # USE LOCAL records ONLY (NO SERVER CALL HERE)
+
 
     for record in records:
         word = record["item"].lower()
