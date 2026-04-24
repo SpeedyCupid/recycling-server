@@ -113,7 +113,10 @@ def get_records():
 
     return jsonify(result)
 
-
+@app.route("/debug-db", methods=["GET"])
+def debug_db():
+    cursor.execute("PRAGMA table_info(records)")
+    return jsonify(cursor.fetchall())
 
 @app.route("/check", methods=["POST"])
 def check_item():
