@@ -151,7 +151,7 @@ def on_change(*args):
     # clear UI
     for widget in suggestion_frame.winfo_children():
         widget.destroy()
-    suggestion_frame.pack_forget()
+   
 
     if not current_text.strip():
         return
