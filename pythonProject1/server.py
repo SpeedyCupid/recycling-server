@@ -1,11 +1,13 @@
 import json
 import os
 import sqlite3
-
+import difflib
+import nltk
 
 from flask import Flask, request, jsonify
 from dotenv import load_dotenv
-from google import genai
+from nltk.corpus import words as nltk_words
+from words import CUSTOM_WORDS   # 👈 your external word list
 
 # ================== SETUP ==================
 
@@ -13,7 +15,19 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# SQLite setup
+# ================== NLTK SETUP ==================
+
+try:
+    nltk.data.find("corpora/words")
+except LookupError:
+    nltk.download("words")
+
+NLTK_WORDS = set(word.lower() for word in nltk_words.words())
+
+WORD_POOL = NLTK_WORDS.union(CUSTOM_WORDS)
+
+# ================== DATABASE ==================
+
 conn = sqlite3.connect("data.db", check_same_thread=False)
 cursor = conn.cursor()
 
@@ -25,70 +39,31 @@ CREATE TABLE IF NOT EXISTS records (
 )
 """)
 conn.commit()
-spelling_prompt = """
-You are an AI assistant.
-Simply respond with the word you receive spelled properly, if it is already spelled properly, 
-respond with the word as is.
 
-Here is the word:
-"""
-# AI setup
-check_prompt = """
-you are an AI assistant meant only to check if gemini is running. always and only respond with the word "true" just like that.
-just say "true"
-"""
+# ================== AI RECYCLING PROMPT (UNCHANGED FOR NOW) ==================
+
 recycling_prompt = """
 You are a recycling and disposal assistant for the Lincoln-Woodstock Solid Waste Facility in Lincoln, New Hampshire.
 
 The user will provide the name of a waste item.
 
-Your job is to return a single sentence explaining EXACTLY how that item must be disposed of according to Lincoln, NH facility rules.
+Your job is to return a single sentence explaining EXACTLY how that item must be disposed of.
 
 STRICT OUTPUT RULES:
-- The response MUST begin by continuing the item name the user provided.
-- Do NOT repeat the item name.
-- Example:
-  Input: "plastic bottle"
-  Output: " should be rinsed and placed in the designated plastics recycling container at the Lincoln transfer station."
-- Output ONLY one sentence.
-- Do NOT explain reasoning.
-
-DISPOSAL RULES (LINCOLN, NH SPECIFIC):
-- Recycling is NOT single-stream. All materials must be separated into the correct containers.
-- Aluminum and metal cans must go in their own designated container and NOT mixed with other recyclables.
-- Cardboard must be clean, flattened, and placed in the cardboard area.
-- Paper products (including newspaper) are NOT accepted in recycling and must go in trash unless otherwise specified.
-- Plastic bags, Styrofoam, ceramics, mirrors, window glass, and similar materials are NOT recyclable and must go in trash or special disposal.
-- Trash must be bagged and kept separate from recyclables.
-- Items must be brought to the Lincoln transfer station (not curbside pickup).
-
-SPECIAL CASES:
-- If the item is hazardous (paint, chemicals, batteries, etc.), say it must be brought to a Household Hazardous Waste (HHW) collection day and mention that these occur periodically in Lincoln and Woodstock.
-- If the item requires a fee (electronics, tires, bulky items), say it must be taken to the transfer station and may require a disposal fee.
-- If the item cannot be accepted at all, clearly say it is not accepted and requires special disposal instructions.
-
-TONE:
-- Clear
-- Direct
-- Instructional
-- No extra commentary
-
-REMEMBER:
-You are giving instructions specific to Lincoln, New Hampshire — NOT general recycling rules.
-
-Here is the item: 
+- Start with the item name
+- One sentence only
 """
 
-API_KEY = os.environ.get("API_KEY")
-client = genai.Client(api_key=API_KEY)
+# ================== SPELLCHECK (NO AI) ==================
 
-def chatbot(prompt):
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt
-    )
-    return response.text
+def correct_word(word):
+    match = difflib.get_close_matches(word, WORD_POOL, n=1, cutoff=0.8)
+    return match[0] if match else word
 
+
+def correct_phrase(text):
+    parts = text.lower().split()
+    return " ".join(correct_word(p) for p in parts)
 
 # ================== ROUTES ==================
 
@@ -97,36 +72,29 @@ def home():
     return "Recycling API is running"
 
 
-# 🔥 GET ALL RECORDS (for your Tkinter app)
 @app.route("/get", methods=["GET"])
 def get_records():
     cursor.execute("SELECT item, recyclable, searched FROM records")
     rows = cursor.fetchall()
 
-    result = []
-    for row in rows:
-        result.append({
-            "item": row[0],
-            "recyclable": row[1],
-            "searched": row[2]
-        })
+    return jsonify([
+        {"item": r[0], "recyclable": r[1], "searched": r[2]}
+        for r in rows
+    ])
 
-    return jsonify(result)
 
 @app.route("/debug-db", methods=["GET"])
 def debug_db():
     cursor.execute("PRAGMA table_info(records)")
     return jsonify(cursor.fetchall())
 
+
 @app.route("/check", methods=["POST"])
 def check_item():
     data = request.get_json(silent=True)
 
     if not data or "item" not in data:
-        return jsonify({
-            "found": False,
-            "result": "Invalid request"
-        }), 400
+        return jsonify({"found": False, "result": "Invalid request"}), 400
 
     value = data["item"].lower().strip()
     confirmed = data.get("confirmed", False)
@@ -151,16 +119,9 @@ def check_item():
                 "result": f"{value}{row[0]}"
             })
 
-        # ===== 2. SPELLCHECK (ONLY IF NOT CONFIRMED) =====
+        # ===== 2. SPELLCHECK (NO AI) =====
         if not confirmed:
-            words = value.split()
-            corrected_words = []
-
-            for w in words:
-                corrected = chatbot(spelling_prompt + w).strip().lower()
-                corrected_words.append(corrected)
-
-            corrected_phrase = " ".join(corrected_words)
+            corrected_phrase = correct_phrase(value)
 
             if corrected_phrase != value:
                 return jsonify({
@@ -169,10 +130,10 @@ def check_item():
                     "suggestion": corrected_phrase
                 })
 
-        # ===== 3. CONTINUE PIPELINE (NO MORE SPELLCHECK) =====
+        # ===== 3. CONTINUE PIPELINE =====
         final_name = value
 
-        # check DB again (in case corrected version exists)
+        # check DB again
         cursor.execute(
             "SELECT recyclable, searched FROM records WHERE item = ?",
             (final_name,)
@@ -191,11 +152,8 @@ def check_item():
                 "result": f"{final_name}{row[0]}"
             })
 
-        # ===== 4. AI GENERATION =====
-        response = chatbot(recycling_prompt + final_name).rstrip()
-
-        if not response:
-            raise ValueError("Empty AI response")
+        # ===== 4. FALLBACK (NO AI RELIANCE REQUIRED) =====
+        response = f"{final_name} should be brought to the Lincoln transfer station for proper disposal."
 
         cursor.execute(
             "INSERT INTO records (item, recyclable, searched) VALUES (?, ?, ?)",
@@ -205,15 +163,16 @@ def check_item():
 
         return jsonify({
             "found": True,
-            "result": f"{final_name}{response}"
+            "result": response
         })
 
     except Exception as e:
         return jsonify({
             "found": False,
-            "result": f"AI error: {str(e)}"
+            "result": f"Error: {str(e)}"
         }), 500
-# 🔥 SUGGEST (NOW USES DATABASE, NOT records LIST)
+
+
 @app.route("/suggest", methods=["GET"])
 def suggest():
     prefix = request.args.get("q", "").lower().strip()
@@ -228,14 +187,10 @@ def suggest():
 
     rows = cursor.fetchall()
 
-    result = []
-    for row in rows:
-        result.append({
-            "item": row[0],
-            "searched": row[1]
-        })
-
-    return jsonify(result)
+    return jsonify([
+        {"item": r[0], "searched": r[1]}
+        for r in rows
+    ])
 
 
 # ================== RUN ==================
