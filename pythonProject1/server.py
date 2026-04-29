@@ -153,13 +153,20 @@ def check_item():
 
         # ===== 2. SPELLCHECK (ONLY IF NOT CONFIRMED) =====
         if not confirmed:
-            corrected = chatbot(spelling_prompt + value).strip().lower()
+            words = value.split()
+            corrected_words = []
 
-            if corrected != value:
+            for w in words:
+                corrected = chatbot(spelling_prompt + w).strip().lower()
+                corrected_words.append(corrected)
+
+            corrected_phrase = " ".join(corrected_words)
+
+            if corrected_phrase != value:
                 return jsonify({
                     "needs_confirmation": True,
                     "original": value,
-                    "suggestion": corrected
+                    "suggestion": corrected_phrase
                 })
 
         # ===== 3. CONTINUE PIPELINE (NO MORE SPELLCHECK) =====
