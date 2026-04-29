@@ -32,5 +32,5 @@ CUSTOM_WORDS = {
     "food", "scraps", "organic", "fruit", "vegetable",
 
     # misc
-    "mirror", "window", "glassware", "ceramic", "porcelain"
+    "mirror", "window", "glassware", "ceramic", "porcelain", "candy"
 }

@@ -55,15 +55,43 @@ STRICT OUTPUT RULES:
 """
 
 # ================== SPELLCHECK (NO AI) ==================
+import difflib
+
+DOMAIN_BOOST = 2.0  # recycling words get priority
+
+def score_word(input_word, candidate):
+    sim = difflib.SequenceMatcher(None, input_word, candidate).ratio()
+
+    length_penalty = abs(len(candidate) - len(input_word)) * 0.05
+
+    bonus = DOMAIN_BOOST if candidate in CUSTOM_WORDS else 0
+
+    return sim + bonus - length_penalty
+
 
 def correct_word(word):
-    match = difflib.get_close_matches(word, WORD_POOL, n=1, cutoff=0.8)
-    return match[0] if match else word
+    best = word
+    best_score = -1
 
+    for candidate in WORD_POOL:
+        s = score_word(word, candidate)
+        if s > best_score:
+            best_score = s
+            best = candidate
+
+    return best
+
+
+# ---- phrase handling ----
 
 def correct_phrase(text):
-    parts = text.lower().split()
-    return " ".join(correct_word(p) for p in parts)
+    words = text.lower().split()
+
+    corrected = []
+    for w in words:
+        corrected.append(correct_word(w))
+
+    return " ".join(corrected)
 
 # ================== ROUTES ==================
 
