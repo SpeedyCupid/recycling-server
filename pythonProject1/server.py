@@ -127,7 +127,8 @@ def check_item():
                 return jsonify({
                     "needs_confirmation": True,
                     "original": value,
-                    "suggestion": corrected_phrase
+                    "suggestion": corrected_phrase,
+                    "can_cancel": True
                 })
 
         # ===== 3. CONTINUE PIPELINE =====

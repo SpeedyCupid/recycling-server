@@ -97,6 +97,12 @@ def button_pressed():
             clear_frame(confirm_frame)
             show_confirmation()
 
+            def cancel_action():
+                clear_frame(confirm_frame)
+                hide_all_frames()
+                label2.config(text="Cancelled.")
+                entry1.delete(0, tk.END)
+
             def use_suggestion():
                 clear_frame(confirm_frame)
                 hide_all_frames()
@@ -111,6 +117,7 @@ def button_pressed():
 
             tk.Button(confirm_frame, text="Yes", command=use_suggestion).pack(pady=2)
             tk.Button(confirm_frame, text="No", command=use_original).pack(pady=2)
+            tk.Button(confirm_frame, text="Cancel", command=cancel_action).pack(pady=2)
 
             return
 
