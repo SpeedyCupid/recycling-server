@@ -70,6 +70,10 @@ def score_word(input_word, candidate):
 
 
 def correct_word(word):
+    # 🔥 STEP 0: if already valid, do nothing
+    if word in WORD_POOL:
+        return word
+
     best = word
     best_score = -1
 
