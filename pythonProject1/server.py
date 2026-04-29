@@ -146,24 +146,26 @@ def check_item():
             )
             conn.commit()
 
-            saved_response = row[0]
-
             return jsonify({
                 "found": True,
-                "result": f"{value}{saved_response}"
+                "result": f"{value}{row[0]}"
             })
 
-        # ===== 2. SPELLING (ONLY IF NOT FOUND) =====
-        respo = chatbot(spelling_prompt + value).strip().lower()
+        # ===== 2. SPELLCHECK (ONLY IF NOT CONFIRMED) =====
+        if not confirmed:
+            corrected = chatbot(spelling_prompt + value).strip().lower()
 
-        if not confirmed and respo != value:
-            return jsonify({
-                "suggestion": respo
-            })
+            if corrected != value:
+                return jsonify({
+                    "needs_confirmation": True,
+                    "original": value,
+                    "suggestion": corrected
+                })
 
-        final_name = respo if confirmed else value
+        # ===== 3. CONTINUE PIPELINE (NO MORE SPELLCHECK) =====
+        final_name = value
 
-        # ===== 3. CHECK DATABASE AGAIN (AFTER CORRECTION) =====
+        # check DB again (in case corrected version exists)
         cursor.execute(
             "SELECT recyclable, searched FROM records WHERE item = ?",
             (final_name,)
@@ -177,14 +179,12 @@ def check_item():
             )
             conn.commit()
 
-            saved_response = row[0]
-
             return jsonify({
                 "found": True,
-                "result": f"{final_name}{saved_response}"
+                "result": f"{final_name}{row[0]}"
             })
 
-        # ===== 4. AI RECYCLING =====
+        # ===== 4. AI GENERATION =====
         response = chatbot(recycling_prompt + final_name).rstrip()
 
         if not response:

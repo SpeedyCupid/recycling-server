@@ -1,50 +1,44 @@
 import os
 import tkinter as tk
 from google import genai
-from pygments.lexer import words
-import threading
-import data_helpers
 import requests
 from dotenv import load_dotenv
-import os
 
 load_dotenv()
 
-#this will be how it gets stuff from a server, when this all happens, records.json in here will be deleted
-#import requests
-
 SERVER_URL = "https://recycling-server-ykk0.onrender.com"
+
 def get_records():
     try:
         return requests.get(f"{SERVER_URL}/get").json()
     except:
         return []
 
-#records = requests.get(url)
-#data = records.json()
-# ai stuff
 records = get_records()
 
-DATA_FILE = "records.json"
-recycling_prompt = """
-You are a recycling assistant.
-
-The user will give you the name of an item. Your job is to determine whether the item is recyclable.
-
-Rules:
-- Respond with ONLY one of these three options:
-  - "Recyclable"
-  - "Not Recyclable"
-  - "Special Disposal"
-- if recyclability varies by location or material, use "Not Recyclable".
-- Do not explain answers
-
-Item:
-"""
 API_KEY = os.environ.get("API_KEY")
 client = genai.Client(api_key=API_KEY)
 
-# main part
+# ------------------ FRAME HELPERS ------------------
+
+def clear_frame(frame):
+    for widget in frame.winfo_children():
+        widget.destroy()
+
+def show_suggestions():
+    confirm_frame.pack_forget()
+    suggestion_frame.pack(pady=5)
+
+def show_confirmation():
+    suggestion_frame.pack_forget()
+    confirm_frame.pack(pady=5)
+
+def hide_all_frames():
+    suggestion_frame.pack_forget()
+    confirm_frame.pack_forget()
+
+# ------------------ CORE LOGIC ------------------
+
 def process_final_name(final_name):
     global records
 
@@ -56,10 +50,14 @@ def process_final_name(final_name):
 
         result = response.json()
 
+        # ===== IF IT EXISTS IN DB → STOP IMMEDIATELY =====
         if result.get("found"):
             output = result.get("result")
-        else:
-            output = "No result found."
+            label2.config(text=output)
+            return   # 🚨 IMPORTANT: skip AI entirely
+
+        # ===== OTHERWISE (NOT IN DB) → AI PATH =====
+        output = result.get("result", "No result found.")
 
         records = get_records()
 
@@ -67,7 +65,6 @@ def process_final_name(final_name):
         output = f"Error: {e}"
 
     label2.config(text=output)
-
 
 def button_pressed():
     global records
@@ -92,35 +89,36 @@ def button_pressed():
 
         result = response.json()
 
-        if "suggestion" in result:
+        # -------- CONFIRMATION UI --------
+        if result.get("needs_confirmation"):
             suggestion = result["suggestion"]
+            original = result["original"]
 
-            # 🔥 CLEAR OLD BUTTONS FIRST
-            for widget in suggestion_frame.winfo_children():
-                widget.destroy()
+            clear_frame(confirm_frame)
+            show_confirmation()
 
             def use_suggestion():
-                for widget in suggestion_frame.winfo_children():
-                    widget.destroy()
+                clear_frame(confirm_frame)
+                hide_all_frames()
                 process_final_name(suggestion)
 
             def use_original():
-                for widget in suggestion_frame.winfo_children():
-                    widget.destroy()
-                process_final_name(item)
+                clear_frame(confirm_frame)
+                hide_all_frames()
+                process_final_name(original)
 
             label2.config(text=f"Did you mean '{suggestion}'?")
 
-            tk.Button(suggestion_frame, text="Yes", command=use_suggestion).pack()
-            tk.Button(suggestion_frame, text="No", command=use_original).pack()
+            tk.Button(confirm_frame, text="Yes", command=use_suggestion).pack(pady=2)
+            tk.Button(confirm_frame, text="No", command=use_original).pack(pady=2)
 
             return
 
+        # -------- NORMAL RESULT --------
         if result.get("found"):
             output = result.get("result")
         else:
             output = "No result found."
-
 
         try:
             records = get_records()
@@ -133,10 +131,20 @@ def button_pressed():
 
     label2.config(text=output)
     entry1.delete(0, tk.END)
-#tk stuff
+
+    hide_all_frames()
+
+# ------------------ AUTOCOMPLETE ------------------
 
 def on_change(*args):
     current_text = entry_var.get().lower()
+
+    clear_frame(suggestion_frame)
+    confirm_frame.pack_forget()
+
+    if not current_text.strip():
+        suggestion_frame.pack_forget()
+        return
 
     best_score = -1
     second_best_score = -1
@@ -147,16 +155,6 @@ def on_change(*args):
     third_best_word = ""
 
     suggested_words = []
-
-    # clear UI
-    for widget in suggestion_frame.winfo_children():
-        widget.destroy()
-   
-
-    if not current_text.strip():
-        return
-
-
 
     for record in records:
         word = record["item"].lower()
@@ -193,11 +191,15 @@ def on_change(*args):
         suggested_words.append(third_best_word)
 
     if suggested_words:
-        suggestion_frame.pack(pady=5)
+        show_suggestions()
+    else:
+        suggestion_frame.pack_forget()
+        return
 
     def set_selected(value):
         entry1.delete(0, tk.END)
         entry1.insert(0, value)
+        suggestion_frame.pack_forget()
 
     for suggestion in suggested_words:
         tk.Button(
@@ -207,21 +209,33 @@ def on_change(*args):
             command=lambda s=suggestion: set_selected(s)
         ).pack(pady=2)
 
+# ------------------ TKINTER UI ------------------
+
 root = tk.Tk()
 root.title("Recycling Project Data Storing")
+
 entry_var = tk.StringVar()
 entry_var.trace_add("write", on_change)
+
 frame1 = tk.Frame(root, bg="blue", bd=2, relief="solid")
 frame1.pack(pady=5)
+
 frame2 = tk.Frame(root, bg="blue", bd=2, relief="solid")
 frame2.pack(pady=5)
+
 label1 = tk.Label(frame1, text="Please input the item you want to dispose of")
 label1.pack()
+
 entry1 = tk.Entry(frame2, textvariable=entry_var)
 entry1.pack()
+
 tk.Button(frame2, text="Search", command=button_pressed).pack(padx=2, pady=2)
+
+# AUTOCOMPLETE FRAME
 suggestion_frame = tk.Frame(root, bd=2, relief="solid")
-suggestion_frame.pack(pady=5)
+
+# CONFIRMATION FRAME (NEW)
+confirm_frame = tk.Frame(root, bd=2, relief="solid")
 
 label2 = tk.Label(root, text="")
 label2.pack()
