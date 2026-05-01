@@ -148,7 +148,7 @@ def check_item():
 
             return jsonify({
                 "found": True,
-                "result": f"{value}{row[0]}"
+                "result": f"{row[0]}"
             })
 
         # ===== 2. SPELLCHECK (NO AI) =====
@@ -182,7 +182,7 @@ def check_item():
 
             return jsonify({
                 "found": True,
-                "result": f"{final_name}{row[0]}"
+                "result": f"{row[0]}"
             })
 
         # ===== 4. FALLBACK (NO AI RELIANCE REQUIRED) =====
