@@ -8,7 +8,17 @@ from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 from nltk.corpus import words as nltk_words
 from words import CUSTOM_WORDS   # 👈 your external word list
+from google import genai
 
+API_KEY = os.environ.get("API_KEY")
+client = genai.Client(api_key=API_KEY)
+
+def chatbot(prompt):
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=prompt
+    )
+    return response.text
 # ================== SETUP ==================
 
 load_dotenv()
@@ -185,9 +195,13 @@ def check_item():
                 "result": f"{row[0]}"
             })
 
-        # ===== 4. FALLBACK (NO AI RELIANCE REQUIRED) =====
-        response = f"{final_name} should be brought to the Lincoln transfer station for proper disposal."
+        # ===== 4. AI FALLBACK =====
+        ai_response = chatbot(recycling_prompt + final_name).strip()
 
+        if not ai_response:
+            raise ValueError("Empty AI response")
+
+        response = ai_response
         cursor.execute(
             "INSERT INTO records (item, recyclable, searched) VALUES (?, ?, ?)",
             (final_name, response, 1)
