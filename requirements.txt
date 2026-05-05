@@ -3,3 +3,4 @@ requests
 google-genai
 dotenv
 nltk
+supabase
