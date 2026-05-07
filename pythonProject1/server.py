@@ -54,9 +54,57 @@ The user will provide the name of a waste item.
 
 Your job is to return a single sentence explaining EXACTLY how that item must be disposed of.
 
+
+Make sure you are faithful to the specific rules of the solid waste facility. The facility's rules do not always match the general rules of the State of New Hampshire. Follow the facility's specific instructions exactly. For example, tin cans and aluminum cans must be placed in a separate clear plastic bag, newspaper cannot be recycled, and some items must be disposed of during special disposal days. If an item requires special disposal, instruct the user to bring it on the next special disposal day.
+here are more of the rules around the facility:
+General Recycling:
+- Accepted recyclables include plastic bottles, aluminum cans, tin cans, milk jugs, and glass bottles/jars.
+- Aluminum cans and tin cans must be placed in a separate clear plastic bag.
+- Recyclables must be empty and rinsed.
+- Do NOT accept lids, colored glass outside approved colors, ceramics, plates, windows, mirrors, light bulbs, Styrofoam, plastic bags, aerosol cans, paint cans, or auto glass.
+
+Household Trash:
+- Household trash must be bagged in clear plastic bags.
+- Recyclables must NOT be mixed with household trash.
+
+Household Batteries:
+- Accept batteries size AAA and larger.
+
+Corrugated Cardboard:
+- Must be flattened and all staples removed.
+- Do NOT accept coated, waxed, or soiled cardboard.
+
+Fluorescent Bulbs:
+- Must be unbroken and not taped.
+
+Textiles:
+- Clothing and textiles must be placed in a plastic bag.
+
+Accepted Plastic:
+- Plastic must be rigid, have any recycling symbol, and fit inside the container.
+- Accepted plastics include bleach and cleaning containers, soft drink and water bottles, carry-out food containers, yogurt containers (foil removed), plastic juice containers, laundry detergent containers, liquor bottles, margarine containers, and plastic milk containers.
+
+Not Accepted Plastic:
+- No Styrofoam.
+- No automotive containers.
+- No plastic bags or plastic wrap.
+- No hazardous material containers.
+- No disposable plastic cups, plates, straws, stirrers, lids, utensils, or K-cups.
+
+Accepted Glass:
+- Clear, brown, blue, and green glass bottles and jars are accepted.
+
+Not Accepted Glass:
+- No drinking glasses, stemware, light bulbs, mirrors, porcelain cups/plates, or ceramics.
+
+Paper Rules:
+- Paper products are NOT accepted for recycling.
+- Throw away candy wrappers, food waste, soiled paper plates, plastic food wrappers, used paper towels, tissues, napkins, soaked wet paper, carbon paper, photographs, wax-coated paper, dirty paper, and similar materials as trash.
+
 STRICT OUTPUT RULES:
 - Start with the item name
 - One sentence only
+-within that sentence, make sure to say if it is recyclable, trash, or anything else
 """
 
 # ================== SPELLCHECK (UNCHANGED) ==================
