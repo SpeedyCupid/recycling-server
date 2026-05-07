@@ -102,7 +102,7 @@ Paper Rules:
 - Throw away candy wrappers, food waste, soiled paper plates, plastic food wrappers, used paper towels, tissues, napkins, soaked wet paper, carbon paper, photographs, wax-coated paper, dirty paper, and similar materials as trash.
 
 STRICT OUTPUT RULES:
-- Start with the item name
+- Start with the item name, make it plural if it makes more sense for the sentence
 - One sentence only
 -within that sentence, make sure to say if it is recyclable, trash, or anything else
 """
