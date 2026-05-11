@@ -115,9 +115,9 @@ def button_pressed():
 
             label2.config(text=f"Did you mean '{suggestion}'?")
 
-            tk.Button(confirm_frame, text="Yes", command=use_suggestion).pack(pady=2)
-            tk.Button(confirm_frame, text="No", command=use_original).pack(pady=2)
-            tk.Button(confirm_frame, text="Cancel", command=cancel_action).pack(pady=2)
+            tk.Button(confirm_frame, text="Yes", font=("Arial", 24), command=use_suggestion).pack(pady=2)
+            tk.Button(confirm_frame, text="No", font=("Arial", 24), command=use_original).pack(pady=2)
+            tk.Button(confirm_frame, text="Cancel", font=("Arial", 24), command=cancel_action).pack(pady=2)
 
             return
 
@@ -230,13 +230,13 @@ frame1.pack(pady=5)
 frame2 = tk.Frame(root, bg="blue", bd=2, relief="solid")
 frame2.pack(pady=5)
 
-label1 = tk.Label(frame1, text="Please input the item you want to dispose of")
+label1 = tk.Label(frame1, text="Please input the item you want to dispose of", font=("Arial", 24))
 label1.pack()
 
-entry1 = tk.Entry(frame2, textvariable=entry_var)
+entry1 = tk.Entry(frame2, font=("Arial", 24), textvariable=entry_var)
 entry1.pack()
 
-tk.Button(frame2, text="Search", command=button_pressed).pack(padx=2, pady=2)
+tk.Button(frame2, text="Search", font=("Arial", 24), command=button_pressed).pack(padx=2, pady=2)
 
 # AUTOCOMPLETE FRAME
 suggestion_frame = tk.Frame(root, bd=2, relief="solid")
@@ -244,165 +244,8 @@ suggestion_frame = tk.Frame(root, bd=2, relief="solid")
 # CONFIRMATION FRAME (NEW)
 confirm_frame = tk.Frame(root, bd=2, relief="solid")
 
-label2 = tk.Label(root, text="")
+label2 = tk.Label(root, text="", font=("Arial", 24))
 label2.pack()
-
+Label3 = tk.Label(root,text="Website:www.lincolnnh.gov/solid-waste")
+Label3.pack(side="bottom", pady=10)
 root.mainloop()
-#
-# #data= records.json
-# #requests.put(url, json=data)
-#
-# from google import genai
-# import tkinter as tk
-# import json
-# import os
-# import data_helpers
-#
-# DATA_FILE = "records.json"
-#
-#
-# records = data_helpers.load_data()
-#
-# # ---------------- BUTTON PRESS ----------------
-# def button_pressed():
-#     try:
-#         item = entry1.get()
-#
-#         if not item or not item.strip():
-#             label2.config(text="Please enter an item.")
-#             entry1.delete(0, tk.END)
-#             return
-#
-#         item = item.lower().strip()
-#
-#         results = data_helpers.check_item(
-#             records,
-#             "item",
-#             item,
-#             data_helpers.recycling_prompt,
-#             data_helpers.client
-#         )
-#
-#         if results is None:
-#             output = "No result found."
-#         else:
-#             output = results
-#
-#     except Exception as e:
-#         output = f"Something went wrong: {e}"
-#
-#     label2.config(text=output)
-#     entry1.delete(0, tk.END)
-#
-#
-# # ---------------- SUGGESTIONS ----------------
-# def on_change(*args):
-#     current_text = entry_var.get().lower()
-#
-#     best_score = -1
-#     second_best_score = -1
-#     third_best_score = -1
-#
-#     best_word = ""
-#     second_best_word = ""
-#     third_best_word = ""
-#
-#     suggested_words = []
-#
-#     for widget in suggestion_frame.winfo_children():
-#         widget.destroy()
-#     suggestion_frame.pack_forget()
-#
-#     if not current_text.strip():
-#         return
-#
-#     for record in records:
-#         word = record["item"].lower()
-#
-#         if not word.startswith(current_text):
-#             continue
-#
-#         score = record.get("searched", 0)
-#
-#         typed_letters = list(current_text)
-#         word_letters = list(word)
-#
-#         length_to_check = min(len(word_letters), len(typed_letters))
-#
-#         for i in range(length_to_check):
-#             if word_letters[i] == typed_letters[i]:
-#                 score += 5
-#
-#         if score >= best_score:
-#             third_best_score = second_best_score
-#             third_best_word = second_best_word
-#
-#             second_best_score = best_score
-#             second_best_word = best_word
-#
-#             best_score = score
-#             best_word = word
-#
-#         elif score >= second_best_score:
-#             third_best_score = second_best_score
-#             third_best_word = second_best_word
-#
-#             second_best_score = score
-#             second_best_word = word
-#
-#         elif score >= third_best_score:
-#             third_best_score = score
-#             third_best_word = word
-#
-#     if best_score != -1:
-#         suggested_words.append(best_word)
-#     if second_best_score != -1:
-#         suggested_words.append(second_best_word)
-#     if third_best_score != -1:
-#         suggested_words.append(third_best_word)
-#
-#     if suggested_words:
-#         suggestion_frame.pack(pady=5)
-#
-#     def set_selected(value):
-#         entry1.delete(0, tk.END)
-#         entry1.insert(0, value)
-#
-#     for suggestion in suggested_words:
-#         btn = tk.Button(
-#             suggestion_frame,
-#             text=suggestion,
-#             width=30,
-#             command=lambda s=suggestion: set_selected(s)
-#         )
-#         btn.pack(pady=2)
-#
-#
-# # ---------------- UI ----------------
-# root = tk.Tk()
-# root.title("Recycling Project Data Storing")
-#
-# entry_var = tk.StringVar()
-# entry_var.trace_add("write", on_change)
-#
-# frame1 = tk.Frame(root, bg="blue", bd=2, relief="solid")
-# frame1.pack(pady=5)
-#
-# frame2 = tk.Frame(root, bg="blue", bd=2, relief="solid")
-# frame2.pack(pady=5)
-#
-# label1 = tk.Label(frame1, text="Please input the item you want to dispose of")
-# label1.pack()
-#
-# entry1 = tk.Entry(frame2, textvariable=entry_var)
-# entry1.pack()
-#
-# tk.Button(frame2, text="Search", command=button_pressed).pack(padx=2, pady=2)
-#
-# suggestion_frame = tk.Frame(root, bd=2, relief="solid")
-# suggestion_frame.pack(pady=5)
-#
-# label2 = tk.Label(root, text="")
-# label2.pack()
-#
-# root.mainloop()
