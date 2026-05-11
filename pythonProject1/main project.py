@@ -115,9 +115,9 @@ def button_pressed():
 
             label2.config(text=f"Did you mean '{suggestion}'?")
 
-            tk.Button(confirm_frame, text="Yes", font=("Arial", 24), command=use_suggestion).pack(pady=2)
-            tk.Button(confirm_frame, text="No", font=("Arial", 24), command=use_original).pack(pady=2)
-            tk.Button(confirm_frame, text="Cancel", font=("Arial", 24), command=cancel_action).pack(pady=2)
+            tk.Button(confirm_frame, text="Yes", font=("Arial", 18), command=use_suggestion).pack(pady=2)
+            tk.Button(confirm_frame, text="No", font=("Arial", 18), command=use_original).pack(pady=2)
+            tk.Button(confirm_frame, text="Cancel", font=("Arial", 18), command=cancel_action).pack(pady=2)
 
             return
 
@@ -212,6 +212,7 @@ def on_change(*args):
         tk.Button(
             suggestion_frame,
             text=suggestion,
+            font=("Arial", 18),
             width=30,
             command=lambda s=suggestion: set_selected(s)
         ).pack(pady=2)
@@ -233,10 +234,10 @@ frame2.pack(pady=5)
 label1 = tk.Label(frame1, text="Please input the item you want to dispose of", font=("Arial", 24))
 label1.pack()
 
-entry1 = tk.Entry(frame2, font=("Arial", 24), textvariable=entry_var)
+entry1 = tk.Entry(frame2, font=("Arial", 18), textvariable=entry_var)
 entry1.pack()
 
-tk.Button(frame2, text="Search", font=("Arial", 24), command=button_pressed).pack(padx=2, pady=2)
+tk.Button(frame2, text="Search", font=("Arial", 18), command=button_pressed).pack(padx=2, pady=2)
 
 # AUTOCOMPLETE FRAME
 suggestion_frame = tk.Frame(root, bd=2, relief="solid")
@@ -244,7 +245,7 @@ suggestion_frame = tk.Frame(root, bd=2, relief="solid")
 # CONFIRMATION FRAME (NEW)
 confirm_frame = tk.Frame(root, bd=2, relief="solid")
 
-label2 = tk.Label(root, text="", font=("Arial", 24))
+label2 = tk.Label(root, text="", font=("Arial", 18))
 label2.pack()
 Label3 = tk.Label(root,text="Website:www.lincolnnh.gov/solid-waste")
 Label3.pack(side="bottom", pady=10)
