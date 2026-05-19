@@ -16,8 +16,7 @@ def get_records():
 
 records = get_records()
 
-API_KEY = os.environ.get("API_KEY")
-client = genai.Client(api_key=API_KEY)
+
 
 # ------------------ FRAME HELPERS ------------------
 
