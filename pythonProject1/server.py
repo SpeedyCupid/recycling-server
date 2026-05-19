@@ -177,7 +177,7 @@ Separate Facility Containers:
 - Tree limbs and brush have their own separate container.
 
 Weight-Based Disposal Fees:
-- Sofas, chairs, and couches cost $0.10 per pound.
+- Sofas, chairs, and couches cost $0.05 per pound.
 - Carpet costs $0.05 per pound.
 - Sheetrock and asphalt shingles cost $0.05 per pound.
 - Construction debris costs $0.05 per pound.
