@@ -116,8 +116,9 @@ def button_pressed():
             label2.config(text=f"Did you mean '{suggestion}'?")
 
             tk.Button(confirm_frame, text="Yes", font=("Arial", 18), command=use_suggestion).pack(pady=2)
-            tk.Button(confirm_frame, text="No", font=("Arial", 18), command=use_original).pack(pady=2)
-            tk.Button(confirm_frame, text="Cancel", font=("Arial", 18), command=cancel_action).pack(pady=2)
+            tk.Button(confirm_frame, text="No, I meant something else", font=("Arial", 18), command=cancel_action).pack(pady=2)
+            tk.Button(confirm_frame, text="No, I wrote it correctly", font=("Arial", 18), command=use_original).pack(pady=2)
+
 
             return
 
@@ -233,6 +234,7 @@ frame2.pack(pady=5)
 
 label1 = tk.Label(frame1, text="Please input the item you want to dispose of", font=("Arial", 24))
 label1.pack()
+label_i = tk.Label(frame1, text="Some items may not appear in autocomplete yet, that is okay — the system can still recognize and learn new items.")
 
 entry1 = tk.Entry(frame2, font=("Arial", 18), textvariable=entry_var)
 entry1.pack()
